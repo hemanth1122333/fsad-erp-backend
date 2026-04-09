@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EduERP Backend</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f3f7ff;
+      --panel: rgba(255, 255, 255, 0.9);
+      --text: #0f172a;
+      --muted: #64748b;
+      --primary: #215eff;
+      --accent: #0f766e;
+      --line: rgba(148, 163, 184, 0.28);
+      --shadow: 0 24px 60px rgba(15, 23, 42, 0.14);
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body { min-height: 100%; }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(33, 94, 255, 0.18), transparent 28%),
+        radial-gradient(circle at 80% 10%, rgba(15, 118, 110, 0.14), transparent 20%),
+        linear-gradient(160deg, #edf4ff 0%, #f8fbff 46%, #eef4ff 100%);
+      display: grid;
+      place-items: center;
+      padding: 32px;
+    }
+
+    .shell {
+      width: min(920px, 100%);
+      display: grid;
+      gap: 20px;
+      background: var(--panel);
+      border: 1px solid rgba(255, 255, 255, 0.78);
+      border-radius: 28px;
+      padding: 28px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+    }
+
+    .hero {
+      display: grid;
+      gap: 14px;
+      padding: 28px;
+      border-radius: 24px;
+      background:
+        radial-gradient(circle at top right, rgba(255, 255, 255, 0.16), transparent 30%),
+        linear-gradient(145deg, rgba(33, 94, 255, 0.96), rgba(15, 118, 110, 0.9));
+      color: #fff;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .badge {
+      width: fit-content;
+      padding: 0.5rem 0.8rem;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      font-size: 0.8rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    h1, h2, p { margin: 0; }
+
+    h1 {
+      font-size: clamp(2rem, 5vw, 3.6rem);
+      line-height: 1.05;
+      letter-spacing: -0.04em;
+      max-width: 10ch;
+    }
+
+    .hero p {
+      max-width: 64ch;
+      line-height: 1.7;
+      color: rgba(255, 255, 255, 0.88);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      padding: 18px;
+      border-radius: 22px;
+      background: rgba(255, 255, 255, 0.82);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      box-shadow: 0 12px 24px rgba(15, 23, 42, 0.06);
+    }
+
+    .card h2 {
+      margin-bottom: 8px;
+      font-size: 1rem;
+    }
+
+    .card p, .links a {
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .links {
+      display: grid;
+      gap: 10px;
+    }
+
+    .links a {
+      display: inline-flex;
+      width: fit-content;
+      padding: 0.7rem 0.95rem;
+      border-radius: 14px;
+      background: rgba(33, 94, 255, 0.08);
+      color: var(--primary);
+      font-weight: 700;
+      text-decoration: none;
+      border: 1px solid rgba(33, 94, 255, 0.12);
+    }
+
+    .links a.secondary {
+      background: rgba(15, 118, 110, 0.08);
+      color: var(--accent);
+      border-color: rgba(15, 118, 110, 0.14);
+    }
+
+    .foot {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-size: 0.92rem;
+      padding: 2px 4px 0;
+    }
+
+    @media (max-width: 860px) {
+      .grid { grid-template-columns: 1fr; }
+      .shell { padding: 18px; }
+      .hero { padding: 22px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="hero">
+      <div class="badge">EduERP backend online</div>
+      <h1>System ready</h1>
+      <p>
+        The Spring Boot backend is running and serving API requests. Use the frontend app for the full ERP experience,
+        or inspect the endpoints below while the server is live.
+      </p>
+    </section>
+
+    <section class="grid">
+      <article class="card">
+        <h2>API base</h2>
+        <p>The backend API is mounted at <strong>/api</strong>.</p>
+      </article>
+      <article class="card">
+        <h2>Authentication</h2>
+        <p>Sign in and signup endpoints are available under <strong>/api/auth</strong>.</p>
+      </article>
+      <article class="card">
+        <h2>Frontend</h2>
+        <p>The React UI runs separately on the Vite dev server.</p>
+      </article>
+    </section>
+
+    <section class="card links">
+      <h2>Quick links</h2>
+      <a href="/api/auth/captcha-images">Open CAPTCHA endpoint</a>
+      <a class="secondary" href="http://localhost:5173">Open frontend app</a>
+    </section>
+
+    <div class="foot">
+      <span>Backend: <strong>http://localhost:8080</strong></span>
+      <span>Use the frontend for login, dashboard, attendance, and reports.</span>
+    </div>
+  </main>
+</body>
+</html>
