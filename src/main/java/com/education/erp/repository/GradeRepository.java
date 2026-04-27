@@ -13,6 +13,7 @@ import java.util.Optional;
 public interface GradeRepository extends JpaRepository<Grade, Long> {
     List<Grade> findByStudent_Id(Long studentId);
     List<Grade> findByClassEntity_Id(Long classId);
+    Optional<Grade> findByStudent_IdAndSubjectAndAssessmentName(Long studentId, String subject, String assessmentName);
     
     @Query("SELECT g FROM Grade g WHERE g.student.id = :studentId AND g.classEntity.id = :classId AND g.assessmentName = :assessmentName")
     Optional<Grade> findByStudentIdAndClassIdAndAssessmentName(

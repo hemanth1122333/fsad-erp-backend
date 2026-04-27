@@ -19,6 +19,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.core.env.Environment;
 
 /**
  * Main security configuration class.
@@ -33,6 +34,9 @@ public class WebSecurityConfig {
 
     @Autowired
     private AuthEntryPointJwt unauthorizedHandler;
+
+    @Autowired
+    private Environment env;
 
     @Bean
     public AuthTokenFilter authenticationJwtTokenFilter() {
@@ -62,7 +66,13 @@ public class WebSecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.addAllowedOriginPattern("http://localhost:5173");
+
+        // Allow frontend origins from environment variable or default localhost patterns
+        String allowedOrigins = env.getProperty("CORS_ALLOWED_ORIGINS", "http://localhost:*,http://127.0.0.1:*");
+        for (String origin : allowedOrigins.split(",")) {
+            configuration.addAllowedOriginPattern(origin.trim());
+        }
+
         configuration.addAllowedHeader("*");
         configuration.addAllowedMethod("*");
         configuration.setAllowCredentials(true);

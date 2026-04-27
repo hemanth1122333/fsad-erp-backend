@@ -7,8 +7,10 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 
 @Component
@@ -147,24 +149,109 @@ public class DataSeeder implements CommandLineRunner {
     }
 
     private void seedGrades(Student student, ClassEntity classEntity) {
-        String[] assessments = {"Quiz 1", "Mid Term", "Final Project", "Presentation"};
-        for (String assessment : assessments) {
-            if (gradeRepository.findByStudentIdAndClassIdAndAssessmentName(student.getId(), classEntity.getId(), assessment).isEmpty()) {
-                Grade grade = new Grade();
-                grade.setStudent(student);
-                grade.setClassEntity(classEntity);
-                grade.setAssessmentName(assessment);
-                grade.setSubject(classEntity.getName());
-                double marks = Math.random() * 100;
-                grade.setMarksObtained(new java.math.BigDecimal(String.valueOf(marks)));
-                grade.setMaxMarks(new java.math.BigDecimal("100.0"));
-                grade.setGradeLetter(marks >= 80 ? "A" : marks >= 70 ? "B" : "C");
-                grade.setRemark("Good progress");
-                grade.setRecordedAt(LocalDateTime.now());
-                gradeRepository.save(grade);
-            }
+        List<GradeSeed> grades = gradeSeedsFor(student.getAdmissionNumber());
+        normalizeExistingGrades(student, classEntity, grades);
+
+        for (GradeSeed seed : grades) {
+            Grade grade = gradeRepository.findByStudent_IdAndSubjectAndAssessmentName(student.getId(), seed.subject(), seed.assessment())
+                    .orElseGet(Grade::new);
+            grade.setStudent(student);
+            grade.setClassEntity(classEntity);
+            grade.setAssessmentName(seed.assessment());
+            grade.setSubject(seed.subject());
+            grade.setMarksObtained(BigDecimal.valueOf(seed.marks()));
+            grade.setMaxMarks(BigDecimal.valueOf(100));
+            grade.setGradeLetter(gradeLetter(seed.marks()));
+            grade.setRemark(remarkFor(seed.marks()));
+            grade.setRecordedAt(LocalDateTime.now());
+            gradeRepository.save(grade);
         }
     }
+
+    private void normalizeExistingGrades(Student student, ClassEntity classEntity, List<GradeSeed> seeds) {
+        List<Grade> existingGrades = gradeRepository.findByStudent_Id(student.getId()).stream()
+                .filter(grade -> grade.getClassEntity() != null && grade.getClassEntity().getId().equals(classEntity.getId()))
+                .sorted(Comparator.comparing(Grade::getId))
+                .toList();
+
+        int updateCount = Math.min(existingGrades.size(), seeds.size());
+        for (int i = 0; i < updateCount; i++) {
+            Grade grade = existingGrades.get(i);
+            GradeSeed seed = seeds.get(i);
+            grade.setAssessmentName(seed.assessment());
+            grade.setSubject(seed.subject());
+            grade.setMarksObtained(BigDecimal.valueOf(seed.marks()));
+            grade.setMaxMarks(BigDecimal.valueOf(100));
+            grade.setGradeLetter(gradeLetter(seed.marks()));
+            grade.setRemark(remarkFor(seed.marks()));
+            gradeRepository.save(grade);
+        }
+    }
+
+    private List<GradeSeed> gradeSeedsFor(String admissionNumber) {
+        if ("STD-2402".equals(admissionNumber)) {
+            return List.of(
+                    new GradeSeed("Data Structures", "Quiz 1", 78),
+                    new GradeSeed("Database Systems", "Mid Term", 86),
+                    new GradeSeed("Operating Systems", "Lab Practical", 64),
+                    new GradeSeed("Web Technology", "Project", 91),
+                    new GradeSeed("Discrete Mathematics", "Assignment", 58),
+                    new GradeSeed("Technical Communication", "Presentation", 73)
+            );
+        }
+        if ("STD-2403".equals(admissionNumber)) {
+            return List.of(
+                    new GradeSeed("Data Structures", "Quiz 1", 42),
+                    new GradeSeed("Database Systems", "Mid Term", 51),
+                    new GradeSeed("Operating Systems", "Lab Practical", 36),
+                    new GradeSeed("Web Technology", "Project", 67),
+                    new GradeSeed("Discrete Mathematics", "Assignment", 28),
+                    new GradeSeed("Technical Communication", "Presentation", 61)
+            );
+        }
+        return List.of(
+                new GradeSeed("Data Structures", "Quiz 1", 88),
+                new GradeSeed("Database Systems", "Mid Term", 76),
+                new GradeSeed("Operating Systems", "Lab Practical", 69),
+                new GradeSeed("Web Technology", "Project", 93),
+                new GradeSeed("Discrete Mathematics", "Assignment", 54),
+                new GradeSeed("Technical Communication", "Presentation", 82)
+        );
+    }
+
+    private String gradeLetter(double marks) {
+        if (marks >= 85) {
+            return "A";
+        }
+        if (marks >= 70) {
+            return "B";
+        }
+        if (marks >= 55) {
+            return "C";
+        }
+        if (marks >= 40) {
+            return "D";
+        }
+        return "F";
+    }
+
+    private String remarkFor(double marks) {
+        if (marks >= 85) {
+            return "Excellent work. Keep the same consistency.";
+        }
+        if (marks >= 70) {
+            return "Good progress. Strengthen revision before exams.";
+        }
+        if (marks >= 55) {
+            return "Satisfactory. Needs more practice for higher accuracy.";
+        }
+        if (marks >= 40) {
+            return "Needs improvement. Revise basics and submit practice work.";
+        }
+        return "Poor performance. Meet the teacher for a recovery plan.";
+    }
+
+    private record GradeSeed(String subject, String assessment, double marks) {}
 
     private void seedAssignments(ClassEntity classEntity, Teacher teacher) {
         String[] assignments = {"DSA Problem Set 1", "Recursion Exercises", "Graph Algorithms", "Dynamic Programming"};

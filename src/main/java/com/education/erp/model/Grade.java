@@ -32,6 +32,9 @@ public class Grade {
     
     @Column(name = "assessment_name", nullable = false, length = 120)
     private String assessmentName;
+
+    @Column(name = "assessment_type", length = 40)
+    private String assessmentType;
     
     @Column(name = "marks_obtained", precision = 6, scale = 2, nullable = false)
     private BigDecimal marksObtained;

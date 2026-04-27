@@ -14,6 +14,7 @@ public class GradeRequest {
     private Long classId;
 
     private String subject;
+    private String assessmentType;
     private String assessmentName;
     private BigDecimal marksObtained;
     private BigDecimal maxMarks;
