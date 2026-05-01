@@ -67,10 +67,14 @@ public class WebSecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        // Allow frontend origins from environment variable or default localhost patterns
-        String allowedOrigins = env.getProperty("CORS_ALLOWED_ORIGINS", "http://localhost:*,http://127.0.0.1:*");
+        // Allow frontend origins from environment variable or default to any origin in production
+        String allowedOrigins = env.getProperty("CORS_ALLOWED_ORIGINS", "*");
         for (String origin : allowedOrigins.split(",")) {
-            configuration.addAllowedOriginPattern(origin.trim());
+            String trimmed = origin.trim();
+            if (trimmed.isEmpty()) {
+                continue;
+            }
+            configuration.addAllowedOriginPattern(trimmed);
         }
 
         configuration.addAllowedHeader("*");
